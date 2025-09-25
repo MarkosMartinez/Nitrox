@@ -42,16 +42,13 @@
     </Target>
 
     <Target Name="FindGameAndIncludeReferences" BeforeTargets="ResolveAssemblyReferences" Condition="'$(_NitroxDiscovery_TaskAssembly)' != '' and ('$(UnityModLibrary)' == 'true' or '$(TestLibrary)' == 'true')">
-        <!-- Check if SubnauticaPath is manually specified via MSBuild property -->
         <PropertyGroup Condition="'$(SubnauticaPath)' != ''">
             <GameDir>$(SubnauticaPath)</GameDir>
         </PropertyGroup>
         
-        <!-- Validate the manually provided path -->
         <Error Condition="'$(SubnauticaPath)' != '' and !Exists('$(SubnauticaPath)')" Text="The manually specified Subnautica path '$(SubnauticaPath)' does not exist. Please verify the path is correct." />
         <Error Condition="'$(SubnauticaPath)' != '' and !Exists('$(SubnauticaPath)\Subnautica.exe') and !Exists('$(SubnauticaPath)\Subnautica')" Text="The specified path '$(SubnauticaPath)' does not appear to be a valid Subnautica installation directory. The Subnautica executable was not found." />
         
-        <!-- Try automatic discovery if no manual path is specified -->
         <DiscoverGame GameName="Subnautica" IntermediateOutputPath="$(IntermediateOutputPath)" Condition="'$(SubnauticaPath)' == ''">
             <Output TaskParameter="GamePath" PropertyName="GameDir" />
         </DiscoverGame>
