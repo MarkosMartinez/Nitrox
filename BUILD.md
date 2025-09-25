@@ -55,13 +55,15 @@ export SUBNAUTICA_INSTALLATION_PATH="/home/user/.steam/steam/steamapps/common/Su
 dotnet build
 ```
 
-## Build Order Priority
+## Build Priority Order
 
 The build system checks for the Subnautica installation in the following order:
 
-1. **Manual MSBuild property** (`-p:SubnauticaPath="..."`) - Highest priority
-2. **Automatic discovery** (Steam, Epic, etc.)
-3. **Environment variable** (`SUBNAUTICA_INSTALLATION_PATH`) - Fallback
+1. **Manual MSBuild property** (`-p:SubnauticaPath="..."`) - **Highest priority**
+2. **Automatic discovery** (Steam, Epic, Discord, Microsoft Store, etc.) - **Default behavior**
+3. **Environment variable** (`SUBNAUTICA_INSTALLATION_PATH`) - **Fallback**
+
+The MSBuild property will always override both automatic discovery and environment variables, giving you complete control over which Subnautica installation to use for compilation.
 
 ## Error Messages
 
