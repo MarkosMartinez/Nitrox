@@ -34,14 +34,28 @@ public sealed class Steam : IGamePlatform
     private static bool ShouldSkipSteamForUnofficial(string gameRootPath)
     {
         // If pirate detection would have been triggered, don't claim ownership so it falls back to direct launch
-        string subdirDll = Path.Combine(gameRootPath, GameInfo.Subnautica.DataFolder, "Plugins", "x86_64", "steam_api64.dll");
-        if (File.Exists(subdirDll) && !FileSystem.Instance.IsTrustedFile(subdirDll))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            return true;
+            // On macOS, check for steam_api.bundle - for now, assume macOS versions are official
+            return false;
         }
-        string rootDll = Path.Combine(gameRootPath, "steam_api64.dll");
-        if (File.Exists(rootDll) && !FileSystem.Instance.IsTrustedFile(rootDll))
+        
+        try
         {
+            string subdirDll = Path.Combine(gameRootPath, GameInfo.Subnautica.DataFolder, "Plugins", "x86_64", "steam_api64.dll");
+            if (File.Exists(subdirDll) && !FileSystem.Instance.IsTrustedFile(subdirDll))
+            {
+                return true;
+            }
+            string rootDll = Path.Combine(gameRootPath, "steam_api64.dll");
+            if (File.Exists(rootDll) && !FileSystem.Instance.IsTrustedFile(rootDll))
+            {
+                return true;
+            }
+        }
+        catch (Exception)
+        {
+            // If there's any exception during trust verification, assume it's unofficial and skip Steam
             return true;
         }
         return false;
