@@ -248,6 +248,7 @@ internal partial class LaunchGameViewModel(DialogService dialogService, ServerSe
             EpicGames e => await e.StartGameAsync(subnauticaExe, subnauticaLaunchArguments),
             MSStore m => await m.StartGameAsync(subnauticaExe, subnauticaLaunchArguments),
             Discord d => await d.StartGameAsync(subnauticaExe, subnauticaLaunchArguments),
+            Generic g => await g.StartGameAsync(subnauticaExe, subnauticaLaunchArguments),
             _ => throw new Exception($"Directory '{subnauticaPath}' is not a valid {GameInfo.Subnautica.Name} game installation or the game platform is unsupported by Nitrox.")
         };
 

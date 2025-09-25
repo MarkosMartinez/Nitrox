@@ -25,11 +25,27 @@ public sealed class Steam : IGamePlatform
     public bool OwnsGame(string gameRootPath) =>
         gameRootPath switch
         {
-            not null when RuntimeInformation.IsOSPlatform(OSPlatform.OSX) => Directory.Exists(Path.Combine(gameRootPath, "Plugins", "steam_api.bundle")),
-            not null when File.Exists(Path.Combine(gameRootPath, GameInfo.Subnautica.DataFolder, "Plugins", "x86_64", "steam_api64.dll")) => true,
-            not null when File.Exists(Path.Combine(gameRootPath, GameInfo.Subnautica.DataFolder, "Plugins", "steam_api64.dll")) => true,
+            not null when RuntimeInformation.IsOSPlatform(OSPlatform.OSX) => Directory.Exists(Path.Combine(gameRootPath, "Plugins", "steam_api.bundle")) && !ShouldSkipSteamForUnofficial(gameRootPath),
+            not null when File.Exists(Path.Combine(gameRootPath, GameInfo.Subnautica.DataFolder, "Plugins", "x86_64", "steam_api64.dll")) => !ShouldSkipSteamForUnofficial(gameRootPath),
+            not null when File.Exists(Path.Combine(gameRootPath, GameInfo.Subnautica.DataFolder, "Plugins", "steam_api64.dll")) => !ShouldSkipSteamForUnofficial(gameRootPath),
             _ => false
         };
+
+    private static bool ShouldSkipSteamForUnofficial(string gameRootPath)
+    {
+        // If pirate detection would have been triggered, don't claim ownership so it falls back to direct launch
+        string subdirDll = Path.Combine(gameRootPath, GameInfo.Subnautica.DataFolder, "Plugins", "x86_64", "steam_api64.dll");
+        if (File.Exists(subdirDll) && !FileSystem.Instance.IsTrustedFile(subdirDll))
+        {
+            return true;
+        }
+        string rootDll = Path.Combine(gameRootPath, "steam_api64.dll");
+        if (File.Exists(rootDll) && !FileSystem.Instance.IsTrustedFile(rootDll))
+        {
+            return true;
+        }
+        return false;
+    }
 
     public async Task<ProcessEx?> StartPlatformAsync()
     {
